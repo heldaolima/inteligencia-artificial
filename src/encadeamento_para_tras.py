@@ -7,20 +7,20 @@ class Node(object):
         self.children = []
 
 
-    def print_children(self):
+    def print_children(self) -> None:
         for child in self.children:
             print(f"{child.name}: {child.value}")
 
 
-    def has_children(self):
+    def has_children(self) -> bool:
         return len(self.children) > 0
 
 
-    def add_child(self, obj):
+    def add_child(self, obj) -> None:
         self.children.append(obj)
 
     
-    def is_child(self, name:str):
+    def is_child(self, name:str) -> bool:
         for child in self.children:
             if child.name == name:
                 return True
@@ -28,12 +28,11 @@ class Node(object):
 
 
 # util functions from here
-def is_in_facts(var:str, facts:dict):
+def is_in_facts(var:str, facts:dict) -> bool:
     return var in list(facts.keys())
 
 
 def add_in_facts(var: str, facts:dict):
-    print("adding in facts")
     facts[var] = True
 
 
@@ -46,7 +45,6 @@ def get_new_facts(root:Node, facts:dict):
 def look_rules(root:Node, rules):
     for rule in rules:
         consequente = rule.get('cons')
-        # print(list(consequente.keys()))
         if root.name in list(consequente.keys()):
             for antecedente in rule.get('ant'):
                 child = Node(antecedente, False)
@@ -64,29 +62,20 @@ def look_facts(root:Node, facts):
     
     return False
 
-def evaluate_root(root:Node, facts):
-    print(f"Evaluate root: {root.name} | {root.value}")
-    # root.print_children()
+def check_root_and_children(root:Node, facts) -> bool:
     if root.value:
         if not is_in_facts(root.name, facts):
-            print(f"adicionando {root.name} in facts")
             add_in_facts(root.name, facts)
         return True
 
-    # root is true if all its children are
     if root.has_children():
-        print("Tem filhos:")
-        
         flag = True
-        for child in root.children:
-            print(f"{child.name}: {child.value}")
-            
+        for child in root.children:        
             if not child.value:
                 flag = False
                 break
-        
+
         if flag and not is_in_facts(root.name, facts):
-            print(f"adicionando {root.name} in facts")
             add_in_facts(root.name, facts)
         root.value = flag
         return flag
@@ -97,11 +86,9 @@ def verification(root:Node, rules:dict, facts:dict):
     root.value = look_facts(root, facts)
     
     if root.value:
-        # print("I was found in facts!")
         return True
     
-    if evaluate_root(root, facts):
-        # print("My children are bore me!")
+    if check_root_and_children(root, facts):
         return True
 
     look_rules(root, rules)
@@ -111,23 +98,18 @@ def encadeamento_para_tras(root:Node, rules:dict, facts:dict):
     if not root: return
     
     Stack = deque([root])
-    Preorder = []
+    preorder_visited = []
 
     while Stack:
         top = Stack.pop()
-        Preorder.append(top)
+        preorder_visited.append(top)
 
-        ans = verification(top, rules, facts)
+        found = verification(top, rules, facts)
 
-        if ans:
-            # print(f"Top in if: {top.name}")
-            for previous in Preorder:
-                # print(f"Previous {previous.name}")
-                if previous.is_child(top.name):
-                    # print("Entrei no evaluate")
-                    evaluate_root(previous, facts)
-            #dê um jeito de ajustar o pai: evaluate father
-            print(facts)
+        if found:
+            for previous in preorder_visited:
+                if previous.is_child(top.name): 
+                    check_root_and_children(previous, facts)
 
         for child in top.children:
             Stack.append(child)
@@ -178,17 +160,14 @@ def main():
     }
 
     root = Node('A', False)
+
     ans = encadeamento_para_tras(root, rules, facts)
-    if (ans): print(f"Podemos concluir ", end='')
-    else: print(f"Não podemos concluir ", end='')
+    if (ans): 
+        print(f"Podemos concluir ", end='')
+    else: 
+        print(f"Não podemos concluir ", end='')
+    
     print(root.name)
     root.print_children()
-
-    # tree structure is needed
-    # eu preciso manter o controle pais-filhos: tanto registrar direitinho os filhos de um nó quanto os seus valores
-    # raiz: Objetivo setado pra falso
-    # constrói os filhos e faz modus_ponens
-    # retorna quando ou a raiz der verdadeira ou eu tiver exaurido as opções
-        
 
 main()
