@@ -140,7 +140,7 @@ def get_rules(rules:list, variables:list, folder):
                         variables.append(var)
                 i += 1
     except IOError as error:
-        raise FileNotFoundError("Files not found")
+        raise FileNotFoundError("Pasta não econtrada")
 
 
 def get_facts(facts:dict, variables:list, folder):
@@ -153,7 +153,7 @@ def get_facts(facts:dict, variables:list, folder):
                 if fact['variavel'] not in variables: 
                         variables.append(fact['variavel'])
     except IOError as error:
-        raise FileNotFoundError("Files not found")
+        raise FileNotFoundError("Pasta não encontrada")
 
 
 def print_rules(rules:list):
@@ -185,7 +185,7 @@ def main(argv):
         get_rules(rules, variables, argv[1])
         get_facts(facts, variables, argv[1])
     except Exception as e:
-        print(f'ERROR: {e.args[0]}')
+        print(f'ERRO: {e.args[0]}')
         return 
 
     print('-----------------------------')
@@ -201,6 +201,11 @@ def main(argv):
     print()
 
     question = str(input("Faça a sua pergunta: ")).upper()
+    
+    if question not in variables:
+        print("ERRO: A variável não se encontra nos fatos nem nas regras")
+        return
+    
     root_q = Node(question, False)
     ans = encadeamento_para_tras(root_q, rules, facts)
     
@@ -210,4 +215,6 @@ def main(argv):
     else:
         print('não pode ser inferida a partir das regras e fatos')
 
-main(sys.argv)
+
+if len(sys.argv) <= 1: print("ERRO: Pasta de exemplos não foi fornecida")
+else: main(sys.argv)
