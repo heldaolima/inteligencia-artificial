@@ -1,5 +1,6 @@
 from collections import deque
 import csv
+import sys
 
 class Node(object):
     def __init__(self, name:str, value:bool) -> None:
@@ -60,7 +61,7 @@ def look_facts(root:Node, facts):
             if not is_in_facts(root.name, facts):
                 add_in_facts(root.name, facts)
             return True
-    
+
     return False
 
 def check_root_and_children(root:Node, facts) -> bool:
@@ -97,10 +98,9 @@ def verification(root:Node, rules:dict, facts:dict):
 
 def encadeamento_para_tras(root:Node, rules:dict, facts:dict):
     if not root: return
-    
     Stack = deque([root])
     preorder_visited = []
-
+    
     while Stack:
         top = Stack.pop()
         preorder_visited.append(top)
@@ -114,39 +114,47 @@ def encadeamento_para_tras(root:Node, rules:dict, facts:dict):
 
         for child in top.children:
             Stack.append(child)
-
+    for node in preorder_visited:
+        print(f'{node.name}: {node.value}')
     return root.value
 
 
 
-def get_rules(rules:list, variables:list): 
-    with open('rules.csv') as rules_file:
-        rules_dict = csv.DictReader(rules_file)
-        i = 0
+def get_rules(rules:list, variables:list, folder): 
+    try:
+        with open(f'./{folder}/rules.csv') as rules_file:
+            rules_dict = csv.DictReader(rules_file)
+            i = 0
 
-        for regra in rules_dict:
-            rules.append({})
-            rules[i]['antecedente'] = {}
-            rules[i]['consequente'] = {}
-            for var in regra['antecedente'].split(' and '):
-                rules[i]['antecedente'][var] = True
-                if var not in variables: 
-                    variables.append(var)
-            for var in regra['consequente']:
-                rules[i]['consequente'][var] = True
-                if var not in variables: 
-                    variables.append(var)
-            i += 1
+            for regra in rules_dict:
+                rules.append({})
+                rules[i]['antecedente'] = {}
+                rules[i]['consequente'] = {}
+                for var in regra['antecedente'].split(' and '):
+                    rules[i]['antecedente'][var] = True
+                    if var not in variables: 
+                        variables.append(var)
+                for var in regra['consequente']:
+                    rules[i]['consequente'][var] = True
+                    if var not in variables: 
+                        variables.append(var)
+                i += 1
+    except IOError as error:
+        raise FileNotFoundError("Files not found")
 
 
-def get_facts(facts:dict, variables:list):
-    with open('facts.csv') as facts_file:
-        facts_dict = csv.DictReader(facts_file)
-        
-        for fact in facts_dict:
-            facts[fact['variavel']] = True
-            if fact['variavel'] not in variables: 
-                    variables.append(fact['variavel'])
+def get_facts(facts:dict, variables:list, folder):
+    try:
+        with open(f'./{folder}/facts.csv') as facts_file:
+            facts_dict = csv.DictReader(facts_file)
+            
+            for fact in facts_dict:
+                facts[fact['variavel']] = True
+                if fact['variavel'] not in variables: 
+                        variables.append(fact['variavel'])
+    except IOError as error:
+        raise FileNotFoundError("Files not found")
+
 
 def print_rules(rules:list):
     for rule in rules:
@@ -168,14 +176,18 @@ def print_facts(facts):
         print(f'{key}: {True}')
 
 
-def main():
+def main(argv):
     rules = []
     facts = {}
     variables = []
-
-    get_rules(rules, variables)
-    get_facts(facts, variables)
     
+    try:
+        get_rules(rules, variables, argv[1])
+        get_facts(facts, variables, argv[1])
+    except Exception as e:
+        print(f'ERROR: {e.args[0]}')
+        return 
+
     print('-----------------------------')
     print('Regras inseridas: ')
     print_rules(rules)
@@ -192,45 +204,10 @@ def main():
     root_q = Node(question, False)
     ans = encadeamento_para_tras(root_q, rules, facts)
     
+    print(f'\nA variável {question} ', end='')
     if ans:
-        print('Found')
+        print('pode ser inferida a partir das regras e fatos')
     else:
-        print('not found')
-    # num_rules = int(input("Insira a quantidade de regras: "))
-    
-    # for i in range(0, num_rules):
-    #     print(f"Regra {i+1}")
-    #     rules.append({})
-        
-    #     print("Atencedente:")
-    #     while (True):
-    #         var = str(input("Variável: ")).upper()
-            
-    #         rules[i]['antecedente'][var] = True
-    #         conj = str(input("Conjução? [S/N]")).upper()
-    #         if conj == 'N': break
-        
-    #     print("Consequente:")
-    #     var = str(input("Variável: ")).upper()
-    #     rules[i]['consequente'] = {var: True}
-    
-    # print(rules)
+        print('não pode ser inferida a partir das regras e fatos')
 
-    # num_facts = int(input("Insira a quantidade de fatos: "))
-    # for i in range(0, num_facts):
-    #     var = str(input("Insira o fato: ")).upper()
-    #     facts[var] = True
-
-    # root_var = str(input("Faça a sua pergunta: ")).upper()
-    
-    # root = Node(root_var, False)
-
-    
-    # if (ans): 
-    #     print(f"Podemos concluir ", end='')
-    # else: 
-    #     print(f"Não podemos concluir ", end='')
-    
-    # print(root.name)
-
-main()
+main(sys.argv)
