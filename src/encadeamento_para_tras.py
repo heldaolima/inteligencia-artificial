@@ -171,6 +171,6 @@ def main():
     # else: 
     #     print(f"Não podemos concluir ", end='')
     
-    print(root.name)
+    # print(root.name)
 
 main()
