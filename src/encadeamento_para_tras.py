@@ -113,6 +113,9 @@ def encadeamento_para_tras(root:Node, rules:dict, facts:dict):
 
         for child in top.children:
             Stack.append(child)
+    print("Nós visitados:")
+    for node in preorder_visited:
+        print(f"{node.name}: {node.value}")
 
     return root.value
 
@@ -145,6 +148,7 @@ def main():
             }
         }
     ]
+    print(rules)
 
     question = {
         "A": True,
@@ -159,15 +163,14 @@ def main():
         'A': False
     }
 
-    root = Node('A', False)
+    # root = Node('A', False)
 
-    ans = encadeamento_para_tras(root, rules, facts)
-    if (ans): 
-        print(f"Podemos concluir ", end='')
-    else: 
-        print(f"Não podemos concluir ", end='')
+    # ans = encadeamento_para_tras(root, rules, facts)
+    # if (ans): 
+    #     print(f"Podemos concluir ", end='')
+    # else: 
+    #     print(f"Não podemos concluir ", end='')
     
     print(root.name)
-    root.print_children()
 
 main()
