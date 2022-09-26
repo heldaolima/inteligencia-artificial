@@ -53,7 +53,7 @@ def look_rules(root:Node, rules):
                 root.add_child(child)
 
 
-def look_facts(root:Node, facts):
+def look_facts(root:Node, facts)->bool:
     for fact in list(facts.keys()):
         if fact == root.name and facts[fact]:
             root.value = True
@@ -84,8 +84,7 @@ def check_root_and_children(root:Node, facts) -> bool:
     else:
         return False
 
-
-def verification(root:Node, rules:list, facts:dict):
+def verification(root:Node, rules:dict, facts:dict):
     root.value = look_facts(root, facts)
     
     if root.value:
@@ -97,33 +96,32 @@ def verification(root:Node, rules:list, facts:dict):
     look_rules(root, rules)
 
 
-def encadeamento_para_tras(root:Node, rules:list, facts:dict):
-    if not root: return
-    Stack = deque([root])
-    preorder_visited = []
+def can_conclude(rule:dict, facts):
+    antecedente_set = set(rule['antecedente'])
+    facts_set = set(facts)
     
-    while Stack:
-        top = Stack.pop()
-        preorder_visited.append(top)
+    #não há diferença entre os conjuntos
+    if len(antecedente_set.difference(facts_set)) == 0:
+        return True
+    return False
 
-        found = verification(top, rules, facts)
 
-        if found:
-            for previous in preorder_visited:
-                if previous.is_child(top.name): 
-                    check_root_and_children(previous, facts)
-
-        for child in top.children:
-            Stack.append(child)
+def encadeamento_para_frente(root:Node, rules:list, facts:dict, used_keys:list, i:int):
+    if i >= len(facts): return
     
+    print(f'i: {i}')
+    used_keys.append(list(facts.keys())[i])
+    print(f'used_keys: {used_keys}')
+    for rule in rules:
+        if can_conclude(rule, used_keys):
+            print(f'conclui {rule["consequente"]}')
+            facts[list(rule['consequente'].keys())[0]] = True
     
-    # print()
-    # for node in preorder_visited:
-    #     print(f'{node.name}: {node.value}')
-    # print()
-    
-    return root.value
+    if look_facts(root, facts):
+        print("ENCONTREI")
+        return True
 
+    return encadeamento_para_frente(root, rules, facts, used_keys, i+1)
 
 
 def get_rules(rules:list, variables:list, folder): 
@@ -222,16 +220,11 @@ def main(argv):
     print('Variáveis disponíveis: ' )
     print_variables(variables)
 
-    question = str(input("Faça a sua pergunta: "))
     
-    if question not in variables:
-        print("ERRO: A variável não se encontra nos fatos nem nas regras")
-        return
+    question = str(input('Faça a sua pergunta: '))
+    root_q = Node(question,False)
+    ans = encadeamento_para_frente(root_q, rules, facts, [], 0)
     
-    root_q = Node(question, False)
-    ans = encadeamento_para_tras(root_q, rules, facts)
-    
-    print(question, end=' ')
     if ans:
         print('pode ser inferido a partir das regras e fatos')
     else:

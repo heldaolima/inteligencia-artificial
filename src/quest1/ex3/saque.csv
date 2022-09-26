@@ -1,0 +1,8 @@
+objeto,valor_pos,valor_neg
+Cartão,verificado,nao_verificado
+Data,expirada,nao_expirada
+Senha,correta,incorreta
+Tentivas,excedidas,nao_excedidas
+Saldo,suficiente,nao_suficiente
+Limite,excedido,nao_excedido
+Pagamento,autorizado,nao_autorizado

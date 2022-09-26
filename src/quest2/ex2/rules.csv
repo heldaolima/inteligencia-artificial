@@ -1,0 +1,7 @@
+antecedente,consequente
+A and B,C
+A,D
+C and D,E
+B and E and F,G
+A and E,H
+D and E and H,I
