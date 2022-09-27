@@ -1,35 +1,17 @@
 from collections import deque
-import csv
 import sys
+import os
 
-class Node(object):
-    def __init__(self, name:str, value:bool) -> None:
-        self.name = name
-        self.value = value
-        self.children = []
+# use 'utils' package
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+# END use 'utils' package
 
-
-    def print_children(self) -> None:
-        for child in self.children:
-            print(f"{child.name}: {child.value}")
-
-
-    def has_children(self) -> bool:
-        return len(self.children) > 0
+import utils.read_csv as read_csv
+from utils.tree import Node
 
 
-    def add_child(self, obj) -> None:
-        self.children.append(obj)
-
-    
-    def is_child(self, name:str) -> bool:
-        for child in self.children:
-            if child.name == name:
-                return True
-        return False
-
-
-# util functions from here
 def is_in_facts(var:str, facts:dict) -> bool:
     return var in list(facts.keys())
 
@@ -63,6 +45,7 @@ def look_facts(root:Node, facts):
             return True
 
     return False
+
 
 def check_root_and_children(root:Node, facts) -> bool:
     if root.value:
@@ -115,50 +98,8 @@ def encadeamento_para_tras(root:Node, rules:list, facts:dict):
 
         for child in top.children:
             Stack.append(child)
-    
-    
-    # print()
-    # for node in preorder_visited:
-    #     print(f'{node.name}: {node.value}')
-    # print()
-    
+
     return root.value
-
-
-
-def get_rules(rules:list, variables:list, folder): 
-    try:
-        with open(f'./{folder}/rules.csv') as rules_file:
-            rules_dict = csv.DictReader(rules_file)
-            i = 0
-
-            for regra in rules_dict:
-                rules.append({})
-                rules[i]['antecedente'] = {}
-                rules[i]['consequente'] = {}
-                for var in regra['antecedente'].split(' and '):
-                    rules[i]['antecedente'][var] = True
-                    if var not in variables: 
-                        variables.append(var)
-                rules[i]['consequente'][regra['consequente']] = True
-                if regra['consequente'] not in variables: 
-                        variables.append(regra['consequente'])
-                i += 1
-    except IOError as error:
-        raise FileNotFoundError("Pasta não econtrada")
-
-
-def get_facts(facts:dict, variables:list, folder):
-    try:
-        with open(f'./{folder}/facts.csv') as facts_file:
-            facts_dict = csv.DictReader(facts_file)
-            
-            for fact in facts_dict:
-                facts[fact['variavel']] = True
-                if fact['variavel'] not in variables: 
-                        variables.append(fact['variavel'])
-    except IOError as error:
-        raise FileNotFoundError("Pasta não encontrada")
 
 
 def print_variables(variables:list):
@@ -203,8 +144,8 @@ def main(argv):
     variables = []
 
     try:
-        get_rules(rules, variables, argv[1])
-        get_facts(facts, variables, argv[1])
+        read_csv.get_rules(rules, variables, argv[1])
+        read_csv.get_facts(facts, variables, argv[1])
     except Exception as e:
         print(f'ERRO: {e.args[0]}')
         return 
