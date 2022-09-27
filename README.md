@@ -73,9 +73,10 @@ O programa aceita como argumentos de linha de comando a pasta com os exemplos, a
     cd src/quest2
 
 Após informar na linha de comado qual pasta de exemplo será utilizada - da mesma forma que a questão 1 - é preciso informar o método de resolução do problema, a saber:
-    - '-misto': utiliza o método misto
-    - '-frente': utiliza o método de encadeamento para frente
-    - '-tras': utiliza o método de encadeamento para trás
+
+- '-misto': utiliza o método misto
+- '-frente': utiliza o método de encadeamento para frente
+- '-tras': utiliza o método de encadeamento para trás
 
 Assim, a seguinte entrada roda a questão 2 utilizando o exemplo 3 e o método de encadeamento para trás:
 
