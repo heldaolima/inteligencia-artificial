@@ -64,7 +64,21 @@ Exemplo:
 
     cd src/quest1
 
-Aqui é possível executar o programa. Ele aceita como argumentos de linha de comando a pasta com os exemplos, a qual devem conter um arquivo 'facts.csv' e um arquivo 'facts.csv', a serem lidos. Assim:
+O programa aceita como argumentos de linha de comando a pasta com os exemplos, a qual devem conter um arquivo 'facts.csv' e um arquivo 'rules.csv', a serem lidos. Assim, o exemplo abaixo roda a questão 1 com os arquivos do exemplo 1:
 
-    python3 quest1.py ex1 # usa os arquivos de exemplo da pasta ex1
+    python3 quest1.py ex1
 
+## Execução da questão 2
+
+    cd src/quest2
+
+Após informar na linha de comado qual pasta de exemplo será utilizada - da mesma forma que a questão 1 - é preciso informar o método de resolução do problema, a saber:
+    - '-misto': utiliza o método misto
+    - '-frente': utiliza o método de encadeamento para frente
+    - '-tras': utiliza o método de encadeamento para trás
+
+Assim, a seguinte entrada roda a questão 2 utilizando o exemplo 3 e o método de encadeamento para trás:
+
+    python3 quest2.py ex3 -tras
+
+A flag de método deve vir após o nome da pasta.
