@@ -203,30 +203,42 @@ def main(argv):
             print(f'{question} foi encontrado nos fatos.')
             return True
     
-    if argv[2] == '-frente':
-        method = 'encadeamento para frente'
-        rules_copy = rules
-        keys = list(facts.keys())
 
-        ans = encadeamento_para_frente(root_q, rules, rules_copy,facts, keys, len(facts))
-    
-    elif argv[2] == '-tras':
-        method = 'encadeamento para trás'
-        ans = encadeamento_para_tras(root_q, rules, facts)
-        root_q.print_children()
-    
-    elif argv[2] == '-misto':
-        method = 'misto'
-        rules_copy = rules
-        keys = list(facts.keys())
-        ans = encadeamento_para_frente(root_q, rules, rules_copy, facts, keys, len(facts))
-        if not ans:
-            ans = encadeamento_para_tras(root_q, rules, facts)
+    methodDict: dict = {
+        "-frente": {
+            "method": "encadeamento para frente",
+            "rules_copy": rules,
+            "keys": list(facts.keys()),
+            "ans": encadeamento_para_frente(root_q, rules, rules, facts, list(facts.keys()), len(facts))
+        },
+        "-tras": {
+            "method": "encadeamento para trás",
+            "ans": encadeamento_para_tras(root_q, rules, facts),
+            "print_children": root_q.print_children()
+        },
+        "-misto": {
+            "method": 'misto',
+            "rules_copy": rules,
+            "keys": list(facts.keys()),
+            "ans_front": encadeamento_para_frente(root_q, rules, rules, facts, list(facts.keys()), len(facts)),
+            "ans_back": encadeamento_para_tras(root_q, rules, facts)
+        }
+    }
 
-    print(f"'{question}'", end=' ')    
-    if ans: print('pode', end=' ')
-    else: print('não pode', end=' ')
-    print(f'ser concluído através do método {method}')
+    for method in ["-frente", "-tras"]:
+        if (argv[2]) != method: 
+            continue     
+        
+        if (method == "-misto"):
+            if (not methodDict[method]["ans_front"]):
+                methodDict[method]["ans_back"]
+        
+        print(f"'{question}'", end=' ')    
+        if "print_children" in methodDict[method].keys(): root_q.print_children()
+        print("pode" if methodDict[method]["ans"] else print("não pode"), f'ser concluído através do método {methodDict[method]["method"]}')
+        
+        return
+
 
 
 if len(sys.argv) <= 1: print("ERRO: Pasta de exemplos não foi fornecida.")
