@@ -101,31 +101,32 @@ def encadeamento_para_tras(root:Node, rules:list, facts:dict):
     return root.value
 
 
-def can_conclude(rule:dict, facts):
+def modus_ponens(rule:dict, facts):
     antecedente_set = set(rule['antecedente'])
     facts_set = set(facts)
-    
+
     #se todas as variáveis dos antecedentes estão nos fatos
     if len(antecedente_set.difference(facts_set)) == 0:
         return True
     return False
 
 
-def encadeamento_para_frente(root:Node, rules:list, rules_copy:list, facts:dict,used_keys:list, i:int):
-    if i > len(facts): return
+def encadeamento_para_frente(root:Node, rules:list, facts:dict):
+    i = len(facts)
+    rules_copy = rules
+    used_keys = list(facts.keys())
     
-    for rule in rules_copy:
-        if can_conclude(rule, used_keys):
-            facts[list(rule['consequente'].keys())[0]] = True
-            rules_copy.remove(rule)
-
-    
-    used_keys.append(list(facts.keys())[i])
-
-    if look_facts(root, facts):
-        return True
- 
-    return encadeamento_para_frente(root, rules, rules_copy, facts, used_keys, i+1)
+    while not i > len(facts):
+        for rule in rules_copy:
+            if modus_ponens(rule, used_keys):
+                facts[list(rule['consequente'].keys())[0]] = True
+                rules_copy.remove(rule)
+        if not i >= len(facts):
+            used_keys.append(list(facts.keys())[i])
+        if look_facts(root, facts):
+            return True
+        i += 1
+    return False
 
 
 def print_variables(variables:list):
@@ -203,26 +204,33 @@ def main(argv):
             print(f'{question} foi encontrado nos fatos.')
             return True
     
-    if argv[2] == '-frente':
-        method = 'encadeamento para frente'
-        rules_copy = rules
-        keys = list(facts.keys())
+    if (argv[2] != "-misto"):
+        methodDict: dict = {
+            "-frente": {
+                "method": "encadeamento para frente",
+                "ans": encadeamento_para_frente(root_q, rules, facts)
+            },
+            "-tras": {
+                "method": "encadeamento para trás",
+                "ans": encadeamento_para_tras(root_q, rules, facts),
+            }
+        }
+        for method in ["-frente", "-tras"]:
+            if (argv[2]) != method: 
+                continue
 
-        ans = encadeamento_para_frente(root_q, rules, rules_copy,facts, keys, len(facts))
-    
-    elif argv[2] == '-tras':
-        method = 'encadeamento para trás'
-        ans = encadeamento_para_tras(root_q, rules, facts)
-        root_q.print_children()
-    
+            print(f"'{question}'", end=' ')
+            if (methodDict[method]["ans"]): print('pode', end=' ')
+            else: print('não pode', end=' ')
+            print(f'ser concluído através do método {methodDict[method]["method"]}')
+            return
+
     elif argv[2] == '-misto':
         method = 'misto'
-        rules_copy = rules
-        keys = list(facts.keys())
-        ans = encadeamento_para_frente(root_q, rules, rules_copy, facts, keys, len(facts))
+        ans = encadeamento_para_frente(root_q, rules, facts)
         if not ans:
-            ans = encadeamento_para_tras(root_q, rules, facts)
-
+            ans = encadeamento_para_tras(root_q, rules, facts)    
+    
     print(f"'{question}'", end=' ')    
     if ans: print('pode', end=' ')
     else: print('não pode', end=' ')
