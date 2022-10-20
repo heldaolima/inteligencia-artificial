@@ -22,56 +22,68 @@ def add_in_facts(var: str, facts:dict):
 
 def get_new_facts(root:Node, facts:dict):
     for child in root.children:
-        if child.value:
-            add_in_facts(facts, child.name)
+        if child.value == root.goal:
+            add_in_facts(child.name, facts)
 
 
 def look_rules(root:Node, rules):
+    print("---- IN LOOK RULES ----")
     for rule in rules:
         consequente = rule.get('consequente')
+        # print(f"Consequente: {consequente}")
         if root.name in list(consequente.keys()):
-            for antecedente in rule.get('antecedente'):
-                child = Node(antecedente, False)
-                root.add_child(child)
+            # print("Root found in consequente")
+            # print(f"Antecedente acima: {rule['antecedente']} ")
+            for antecedente in rule['antecedente']:
+                # print(f"Antecedente var: {antecedente} = {rule['antecedente'][antecedente]}")
+                value = 'SIM' if rule['antecedente'][antecedente] == 'NAO' else 'NAO'
+                root.add_child(Node(antecedente, value, rule['antecedente'][antecedente]))
 
 
 def look_facts(root:Node, facts):
+    print("---- IN LOOK FACTS ----")
     for fact in list(facts.keys()):
-        if fact == root.name and facts[fact]:
-            root.value = True
-            
+        print(f"fact {fact}={facts[fact]} ")
+        if fact == root.name and facts[fact] == root.goal:
+            root.value = root.goal
             if not is_in_facts(root.name, facts):
                 add_in_facts(root.name, facts)
-            return True
 
-    return False
+    return root.value == root.goal
 
 
 def check_root_and_children(root:Node, facts) -> bool:
-    if root.value:
+    if root.value == root.goal:
         if not is_in_facts(root.name, facts):
             add_in_facts(root.name, facts)
         return True
 
     if root.has_children():
         flag = True
-        for child in root.children:        
-            if not child.value:
-                flag = False
-                break
-
-        if flag and not is_in_facts(root.name, facts):
-            add_in_facts(root.name, facts)
-        root.value = flag
+        for child in root.children:
+            if root.goal == 'SIM':
+                # todos devem ser sim
+                if child.value == 'NAO':
+                    flag = False
+                    break
+            
+            if root.goal == 'NAO':
+                # se pelo menos um for nao
+                if child.value == 'NAO':
+                    flag = True
+                    break            
+        
+        if flag:
+            root.value = root.goal
+            if not is_in_facts(root.name, facts):
+                add_in_facts(root.name, facts)
         return flag
     else:
         return False
 
 
 def verification(root:Node, rules:list, facts:dict):
-    root.value = look_facts(root, facts)
-    
-    if root.value:
+    if look_facts(root, facts):
         return True
     
     if check_root_and_children(root, facts):
@@ -99,37 +111,18 @@ def encadeamento_para_tras(root:Node, rules:list, facts:dict):
         for child in top.children:
             Stack.append(child)
 
-    return root.value
+    for node in preorder_visited:
+        print(f'Node: {node.name}. Children: ')
+        for child in node.children:
+            print(f"{child.name} = {child.value}")
+        print()
 
-
-def print_variables(variables:list):
-    for var in variables:
-        print(f'{var}')
-    print()
-
-
-def print_rules(rules:list):
-    for rule in rules:
-        vars_ant = list(rule['antecedente'].keys())
-        num_vars = len(vars_ant)
-        var_cons = list(rule['consequente'].keys())
-        for i in range(0, num_vars):
-            if i == num_vars-1:
-                print(f'{vars_ant[i]} ->', end='')
-            else:
-                print(f'{vars_ant[i]} ^', end='')
-            print(' ', end='')
-        print(f'{var_cons[0]}')
-
-
-def print_facts(facts):
-    for key in list(facts.keys()):
-        print(f'{key}: {True}')
+    return root.value == root.goal
 
 
 def read_facts_from_user(facts:dict, variables):
     print("A base de conhecimento foi deixada vazia. Insira alguns fatos baseado nas variáveis até o momento:")
-    print_variables(variables)
+    read_csv.print_variables(variables)
     
     n_facts = int(input('Insira o número de fatos: '))
     for i in range(0, n_facts):
@@ -137,6 +130,7 @@ def read_facts_from_user(facts:dict, variables):
         if fact not in variables:
             variables.append(fact)
         facts[fact] = True
+
 
 def main(argv):
     rules = []
@@ -155,24 +149,36 @@ def main(argv):
 
     print('-----------------------------')
     print('Regras inseridas: ')
-    print_rules(rules)
+    read_csv.print_rules(rules)
     print('\nBase de Fatos: ')
-    print_facts(facts)
+    read_csv.print_facts(facts)
     print('-----------------------------')
 
     print('Variáveis disponíveis: ' )
-    print_variables(variables)
+    read_csv.print_variables(variables)
 
-    question = str(input("Faça a sua pergunta: "))
+    question = str(input("Escolha a variável (<var>=<SIM/NAO>): ")).replace(' ', '').split('=')
     
-    if question not in variables:
+    while len(question) != 2:
+        question = str(input("Entrada inválida. Escolha a variável (<var>=<SIM/NAO>): ")).split('=')
+    
+    question[1] = question[1].upper()
+
+    if question[1] != 'SIM' and question[1] != 'NAO':
+        print("ERRO: O valor da variável deve ser 'SIM' ou 'NAO'")
+        return
+
+
+    if question[0] not in variables:
         print("ERRO: A variável não se encontra nos fatos nem nas regras")
         return
     
-    root_q = Node(question, False)
+    value = 'SIM' if question[1] == 'NAO' else 'NAO'
+    root_q = Node(question[0], value, question[1])
+    print(f"Raiz: {root_q.name} | valor: {root_q.value} | objetivo: {root_q.goal}")
     ans = encadeamento_para_tras(root_q, rules, facts)
     
-    print(question, end=' ')
+    print(f'{question[0]}={question[1]}', end=' ')
     if ans:
         print('pode ser inferido a partir das regras e fatos')
     else:

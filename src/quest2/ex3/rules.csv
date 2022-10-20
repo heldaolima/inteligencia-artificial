@@ -1,8 +1,8 @@
 antecedente,consequente
-C,M
-A and D,E
-L,H
-B and C,G
-A and B,C
-C,D
-E,H
+C=SIM,M=SIM
+A=SIM and D=SIM,E=SIM
+L=SIM,H=SIM
+B=SIM and C=SIM,G=SIM
+A=SIM and B=SIM,C=SIM
+C=SIM,D=SIM
+E=SIM,H=SIM

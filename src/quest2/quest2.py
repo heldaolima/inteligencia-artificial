@@ -24,7 +24,7 @@ def add_in_facts(var: str, facts:dict):
 def get_new_facts(root:Node, facts:dict):
     for child in root.children:
         if child.value:
-            add_in_facts(facts, child.name)
+            add_in_facts(chid.name, facts)
 
 
 def look_rules(root:Node, rules):
@@ -129,34 +129,9 @@ def encadeamento_para_frente(root:Node, rules:list, facts:dict):
     return False
 
 
-def print_variables(variables:list):
-    for var in variables:
-        print(f'{var}')
-    print()
-
-
-def print_rules(rules:list):
-    for rule in rules:
-        vars_ant = list(rule['antecedente'].keys())
-        num_vars = len(vars_ant)
-        var_cons = list(rule['consequente'].keys())
-        for i in range(0, num_vars):
-            if i == num_vars-1:
-                print(f'{vars_ant[i]} ->', end='')
-            else:
-                print(f'{vars_ant[i]} ^', end='')
-            print(' ', end='')
-        print(f'{var_cons[0]}')
-
-
-def print_facts(facts):
-    for key in list(facts.keys()):
-        print(f'{key}: {True}')
-
-
 def read_facts_from_user(facts:dict, variables):
     print("A base de conhecimento foi deixada vazia. Insira alguns fatos baseado nas variáveis até o momento:")
-    print_variables(variables)
+    read_csv.print_variables(variables)
     
     n_facts = int(input('Insira o número de fatos: '))
     for i in range(0, n_facts):
@@ -182,13 +157,13 @@ def main(argv):
 
     print('-----------------------------')
     print('Regras inseridas: ')
-    print_rules(rules)
+    read_csv.print_rules(rules)
     print('\nBase de Fatos: ')
-    print_facts(facts)
+    read_csv.print_facts(facts)
     print('-----------------------------')
 
     print('Variáveis disponíveis: ' )
-    print_variables(variables)
+    read_csv.print_variables(variables)
 
     ans = False
     method = ''

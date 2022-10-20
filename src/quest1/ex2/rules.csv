@@ -1,7 +1,7 @@
 antecedente,consequente
-A and B,C
-A,D
-C and D,E
-B and E and F,G
-A and E,H
-D and E and G,I
+A=SIM and B=SIM,C=SIM
+A=SIM,D=SIM
+C=SIM and D=SIM,E=SIM
+B=SIM and E=SIM and F=SIM,G=SIM
+A=SIM and E=SIM,H=SIM
+D=SIM and E=SIM and G=SIM,I=SIM

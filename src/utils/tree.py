@@ -1,7 +1,8 @@
 class Node(object):
-    def __init__(self, name:str, value:bool) -> None:
+    def __init__(self, name:str, value:str, goal:str) -> None:
         self.name = name
         self.value = value
+        self.goal = goal
         self.children = []
 
 
