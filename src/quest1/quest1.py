@@ -16,8 +16,8 @@ def is_in_facts(var:str, facts:dict) -> bool:
     return var in list(facts.keys())
 
 
-def add_in_facts(var: str, facts:dict):
-    facts[var] = True
+def add_in_facts(node:Node, facts:dict):
+    facts[node.name] = node.value
 
 
 def get_new_facts(root:Node, facts:dict):
@@ -47,7 +47,7 @@ def look_facts(root:Node, facts):
         if fact == root.name and facts[fact] == root.goal:
             root.value = root.goal
             if not is_in_facts(root.name, facts):
-                add_in_facts(root.name, facts)
+                add_in_facts(root, facts)
 
     return root.value == root.goal
 
@@ -55,7 +55,7 @@ def look_facts(root:Node, facts):
 def check_root_and_children(root:Node, facts) -> bool:
     if root.value == root.goal:
         if not is_in_facts(root.name, facts):
-            add_in_facts(root.name, facts)
+            add_in_facts(root, facts)
         return True
 
     if root.has_children():
@@ -76,7 +76,7 @@ def check_root_and_children(root:Node, facts) -> bool:
         if flag:
             root.value = root.goal
             if not is_in_facts(root.name, facts):
-                add_in_facts(root.name, facts)
+                add_in_facts(root, facts)
         return flag
     else:
         return False

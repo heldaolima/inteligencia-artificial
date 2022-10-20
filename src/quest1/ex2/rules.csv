@@ -2,6 +2,6 @@ antecedente,consequente
 A=SIM and B=SIM,C=SIM
 A=SIM,D=SIM
 C=SIM and D=SIM,E=SIM
-B=SIM and E=SIM and F=SIM,G=SIM
+B=SIM,G=SIM
 A=SIM and E=SIM,H=SIM
 D=SIM and E=SIM and G=SIM,I=SIM
