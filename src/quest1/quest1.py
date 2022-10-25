@@ -179,5 +179,5 @@ def main(argv):
         print('não pode ser inferido a partir das regras e fatos')
 
 
-if len(sys.argv) <= 1: print("ERRO: Pasta de exemplos não foi fornecida")
+if len(sys.argv) <= 1: print("USAGE: python3 ques1.py <pasta_de_exemplo>")
 else: main(sys.argv)

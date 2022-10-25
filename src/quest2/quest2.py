@@ -237,8 +237,8 @@ def main(argv):
     print(f'ser concluído através do método {method}')
 
 
-if len(sys.argv) <= 1: print("ERRO: Pasta de exemplos não foi fornecida.")
-elif len(sys.argv) <= 2 or sys.argv[2] not in ['-frente', '-tras','-misto']: 
+if len(sys.argv) <= 2: print("USAGE: python3 quest2.py <pasta_de_exemplo> <método>\nMétodos: -frente, -tras, -misto")
+elif sys.argv[2] not in ['-frente', '-tras','-misto']: 
     print('''ERRO: Método de resolução não fornecido ou inválido.
 Métodos válidos:
     '-frente': resolve usando encadeamento para frente
