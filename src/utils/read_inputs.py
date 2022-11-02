@@ -81,3 +81,19 @@ def print_rules(rules:list):
 def print_facts(facts:dict):
     for key in facts:
         print(f"{key} = {facts[key]}")
+
+
+def read_facts_from_user(facts:dict, variables):
+    print("A base de conhecimento foi deixada vazia. Insira alguns fatos baseado nas variáveis até o momento:")
+    print_variables(variables)
+    
+    n_facts = int(input('Insira o número de fatos: '))
+    for i in range(0, n_facts):
+        fact = str(input('Variável: '))
+        valor = str(input('Valor (SIM/NAO): ')).upper()
+        while not valor in ['SIM', 'NAO']:
+            print("ERRO: O valor da variável deve ser 'SIM' ou 'NAO'. Insira novamente: ")
+        if fact not in variables:
+            variables.append(fact)
+
+   
