@@ -10,114 +10,7 @@ sys.path.append(parent)
 
 import utils.read_csv as read_csv
 from utils.tree import Node
-
-
-def is_in_facts(var:str, facts:dict) -> bool:
-    return var in list(facts.keys())
-
-
-def add_in_facts(node:Node, facts:dict):
-    facts[node.name] = node.value
-
-
-def get_new_facts(root:Node, facts:dict):
-    for child in root.children:
-        if child.value == root.goal:
-            add_in_facts(child.name, facts)
-
-
-def look_rules(root:Node, rules):
-    print("---- IN LOOK RULES ----")
-    for rule in rules:
-        consequente = rule.get('consequente')
-        # print(f"Consequente: {consequente}")
-        if root.name in list(consequente.keys()):
-            # print("Root found in consequente")
-            # print(f"Antecedente acima: {rule['antecedente']} ")
-            for antecedente in rule['antecedente']:
-                # print(f"Antecedente var: {antecedente} = {rule['antecedente'][antecedente]}")
-                value = 'SIM' if rule['antecedente'][antecedente] == 'NAO' else 'NAO'
-                root.add_child(Node(antecedente, value, rule['antecedente'][antecedente]))
-
-
-def look_facts(root:Node, facts):
-    print("---- IN LOOK FACTS ----")
-    for fact in list(facts.keys()):
-        print(f"fact {fact}={facts[fact]} ")
-        if fact == root.name and facts[fact] == root.goal:
-            root.value = root.goal
-            if not is_in_facts(root.name, facts):
-                add_in_facts(root, facts)
-
-    return root.value == root.goal
-
-
-def check_root_and_children(root:Node, facts) -> bool:
-    if root.value == root.goal:
-        if not is_in_facts(root.name, facts):
-            add_in_facts(root, facts)
-        return True
-
-    if root.has_children():
-        flag = True
-        for child in root.children:
-            if root.goal == 'SIM':
-                # todos devem ser sim
-                if child.value == 'NAO':
-                    flag = False
-                    break
-            
-            if root.goal == 'NAO':
-                # se pelo menos um for nao
-                if child.value == 'NAO':
-                    flag = True
-                    break            
-        
-        if flag:
-            root.value = root.goal
-            if not is_in_facts(root.name, facts):
-                add_in_facts(root, facts)
-        return flag
-    else:
-        return False
-
-
-def verification(root:Node, rules:list, facts:dict):
-    if look_facts(root, facts):
-        return True
-    
-    if check_root_and_children(root, facts):
-        return True
-
-    look_rules(root, rules)
-
-
-def encadeamento_para_tras(root:Node, rules:list, facts:dict):
-    if not root: return
-    Stack = deque([root])
-    preorder_visited = []
-    
-    while Stack:
-        top = Stack.pop()
-        preorder_visited.append(top)
-
-        found = verification(top, rules, facts)
-
-        if found:
-            for previous in preorder_visited:
-                if previous.is_child(top.name): 
-                    check_root_and_children(previous, facts)
-
-        for child in top.children:
-            Stack.append(child)
-
-    for node in preorder_visited:
-        print(f'Node: {node.name}. Children: ')
-        for child in node.children:
-            print(f"{child.name} = {child.value}")
-        print()
-
-    return root.value == root.goal
+from utils.chainings import backward_chaining
 
 
 def read_facts_from_user(facts:dict, variables):
@@ -176,7 +69,9 @@ def main(argv):
     value = 'SIM' if question[1] == 'NAO' else 'NAO'
     root_q = Node(question[0], value, question[1])
     print(f"Raiz: {root_q.name} | valor: {root_q.value} | objetivo: {root_q.goal}")
-    ans = encadeamento_para_tras(root_q, rules, facts)
+    ans = backward_chaining(root_q, rules ,facts)
+
+    # ans = encadeamento_para_tras(root_q, rules, facts)
     
     print(f'{question[0]}={question[1]}', end=' ')
     if ans:

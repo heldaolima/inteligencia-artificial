@@ -12,12 +12,21 @@ def get_rules(rules:list, variables:list, folder):
                 rules[i]['consequente'] = {}
                 for var in regra['antecedente'].split(' and '):
                     variavel = var.split('=')
+                    variavel[1] = variavel[1].upper()
+                    if not variavel[1] in ['SIM', 'NAO']:
+                        print(f"ERRO (regra {i+1}, variavel '{variavel[0]}'): O valor da variável deve ser 'SIM' ou 'NAO'")
+                        exit(1)
                     rules[i]['antecedente'][variavel[0]] = variavel[1]
                     
                     if not variavel[0] in variables: 
                         variables.append(variavel[0])
 
                 consequente = regra['consequente'].split('=')
+                consequente[1] = consequente[1].upper()
+                if not consequente[1] in ['SIM', 'NAO']:
+                        print(f"ERRO (regra {i+1}, variavel '{consequente[0]}'): O valor da variável deve ser 'SIM' ou 'NAO'")
+                        exit(1)
+
                 rules[i]['consequente'][consequente[0]] = consequente[1]
                 
                 if not consequente[0] in variables:
@@ -32,11 +41,19 @@ def get_facts(facts:dict, variables:list, folder):
         with open(f'./{folder}/facts.csv') as facts_file:
             facts_dict = csv.DictReader(facts_file)
             
+            i = 0
             for fact in facts_dict:
                 variavel = fact['variavel'].split('=')
+                variavel[1] = variavel[1].upper()
+                if not variavel[1] in ['SIM', 'NAO']:
+                    print(f"ERRO (fato {i+1}, variavel '{variavel[0]}'): O valor da variável deve ser 'SIM' ou 'NAO'")
+                    exit(1)
+                    
                 facts[variavel[0]] = variavel[1]
+                
                 if not variavel[0] in variables: 
                         variables.append(variavel[0])
+                i += 1
     except IOError as error:
         raise FileNotFoundError("Pasta não encontrada")
 
