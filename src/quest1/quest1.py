@@ -56,8 +56,15 @@ def main(argv):
     
     value = 'SIM' if question[1] == 'NAO' else 'NAO'
     root_q = Node(question[0], value, question[1])
+
+    #preciso olhar nas regras se a pergunta é consequente em mais de uma
+    # e me parece que isso deve ser recursivo, porque não é só com a raiz
+
     print(f"Raiz: {root_q.name} | valor: {root_q.value} | objetivo: {root_q.goal}")
     ans = backward_chaining(root_q, rules ,facts)
+    print('final:')
+    print(f'{root_q.name}={root_q.value} | Children: ')
+    root_q.print_children()
 
     # ans = encadeamento_para_tras(root_q, rules, facts)
     

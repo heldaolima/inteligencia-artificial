@@ -1,0 +1,10 @@
+antecedente,consequente
+K=SIM and L=SIM and M=SIM,I=SIM
+I=SIM and L=SIM and J=SIM,Q=SIM
+C=SIM and D=SIM and E=SIM,B=SIM
+A=SIM and B=SIM,Q=SIM
+L=SIM and N=SIM and O=SIM and P=SIM,Q=SIM
+C=SIM and H=SIM,R=SIM
+R=SIM and J=SIM and M=SIM,S=SIM
+F=SIM and H=SIM,B=SIM
+G=SIM,F=SIM

@@ -8,7 +8,8 @@ class Node(object):
 
     def print_children(self) -> None:
         for child in self.children:
-            print(f"{child.name}: {child.value}")
+            print(f'{child.name}={child.value} obj:{child.goal}', end=' ')
+        print()
 
 
     def has_children(self) -> bool:
@@ -24,3 +25,11 @@ class Node(object):
             if child.name == name:
                 return True
         return False
+
+    
+    def form_branch(self, antecedente:dict):
+        # print(f'\nadicionando antecedente: {antecedente}')
+        for var in list(antecedente.keys()):
+            value = 'SIM' if antecedente[var] == 'NAO' else 'NAO'
+            # print(f'adicionando {var}={value}')
+            self.add_child(Node(var, value, antecedente[var]))

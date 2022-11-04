@@ -40,7 +40,6 @@ def get_facts(facts:dict, variables:list, folder):
     try:
         with open(f'./{folder}/facts.csv') as facts_file:
             facts_dict = csv.DictReader(facts_file)
-            
             i = 0
             for fact in facts_dict:
                 variavel = fact['variavel'].split('=')
